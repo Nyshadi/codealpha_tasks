@@ -3,663 +3,825 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Age Calculator</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Music Player</title>
     <style>
         :root {
-            --primary-color: #4361ee;
-            --secondary-color: #3f37c9;
-            --accent-color: #4895ef;
-            --light-color: #f8f9fa;
-            --dark-color: #212529;
-            --success-color: #4cc9f0;
-            --warning-color: #f72585;
-            --border-radius: 8px;
-            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s ease;
+            --bg-color: #f5f5f5;
+            --text-color: #333;
+            --primary-color: #4a76a8;
+            --secondary-color: #f0f0f0;
+            --player-bg: #fff;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        .dark-mode {
+            --bg-color: #1a1a1a;
+            --text-color: #f0f0f0;
+            --primary-color: #6b9ed3;
+            --secondary-color: #2d2d2d;
+            --player-bg: #2a2a2a;
         }
 
         body {
-            background-color: var(--light-color);
-            color: var(--dark-color);
-            line-height: 1.6;
-            transition: var(--transition);
-        }
-
-        body.dark-mode {
-            background-color: var(--dark-color);
-            color: var(--light-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
         }
 
         .container {
-            max-width: 800px;
-            margin: 2rem auto;
-            padding: 2rem;
-            background-color: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            transition: var(--transition);
-        }
-
-        .dark-mode .container {
-            background-color: #2b2d42;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
         }
 
         header {
-            text-align: center;
-            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
         }
 
         h1 {
+            margin: 0;
             color: var(--primary-color);
-            margin-bottom: 0.5rem;
         }
 
         .theme-toggle {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
             background: none;
             border: none;
             font-size: 1.5rem;
             cursor: pointer;
-            color: var(--dark-color);
-            transition: var(--transition);
+            color: var(--text-color);
         }
 
-        .dark-mode .theme-toggle {
-            color: var(--light-color);
-        }
-
-        .input-section {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        @media (max-width: 600px) {
-            .input-section {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .input-group {
+        .player-container {
             display: flex;
-            flex-direction: column;
+            gap: 30px;
         }
 
-        label {
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: var(--dark-color);
+        .player-main {
+            flex: 2;
+            background-color: var(--player-bg);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
-        .dark-mode label {
-            color: var(--light-color);
+        .playlist-section {
+            flex: 1;
+            background-color: var(--player-bg);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
-        select, input {
-            padding: 0.75rem;
-            border: 1px solid #ddd;
-            border-radius: var(--border-radius);
-            font-size: 1rem;
-            transition: var(--transition);
-        }
-
-        .dark-mode select, .dark-mode input {
-            background-color: #3a3b4a;
-            color: var(--light-color);
-            border-color: #555;
-        }
-
-        button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 500;
-            transition: var(--transition);
-            margin-top: 1rem;
-        }
-
-        button:hover {
-            background-color: var(--secondary-color);
-            transform: translateY(-2px);
-        }
-
-        .results {
-            margin-top: 2rem;
-            padding: 1.5rem;
-            background-color: #f1f8fe;
-            border-radius: var(--border-radius);
-            display: none;
-        }
-
-        .dark-mode .results {
-            background-color: #1e1f2e;
-        }
-
-        .results h2 {
-            color: var(--primary-color);
-            margin-bottom: 1rem;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 0.5rem;
-        }
-
-        .dark-mode .results h2 {
-            border-color: #555;
-        }
-
-        .age-display {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin: 1rem 0;
-            text-align: center;
-        }
-
-        .detailed-results {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        @media (max-width: 500px) {
-            .detailed-results {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .result-item {
-            background-color: white;
-            padding: 1rem;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-        }
-
-        .dark-mode .result-item {
-            background-color: #2b2d42;
-        }
-
-        .result-item h3 {
-            color: var(--accent-color);
-            margin-bottom: 0.5rem;
-            font-size: 1rem;
-        }
-
-        .result-item p {
-            font-size: 1.25rem;
-            font-weight: 500;
-        }
-
-        .milestones {
-            margin-top: 2rem;
-        }
-
-        .milestone {
+        .now-playing {
             display: flex;
             align-items: center;
-            margin-bottom: 1rem;
-            padding: 1rem;
-            background-color: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
+            margin-bottom: 20px;
         }
 
-        .dark-mode .milestone {
-            background-color: #2b2d42;
+        .album-art {
+            width: 120px;
+            height: 120px;
+            background-color: var(--secondary-color);
+            border-radius: 10px;
+            margin-right: 20px;
+            overflow: hidden;
         }
 
-        .milestone-icon {
+        .album-art img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .track-info {
+            flex: 1;
+        }
+
+        .track-title {
             font-size: 1.5rem;
-            margin-right: 1rem;
-            color: var(--accent-color);
+            margin: 0 0 5px 0;
         }
 
-        .milestone-content h3 {
-            margin-bottom: 0.25rem;
-            color: var(--primary-color);
+        .track-artist {
+            font-size: 1.1rem;
+            color: #777;
+            margin: 0 0 15px 0;
         }
 
         .progress-container {
-            margin-top: 2rem;
+            margin-bottom: 20px;
         }
 
         .progress-bar {
-            height: 20px;
-            background-color: #e9ecef;
-            border-radius: 10px;
-            overflow: hidden;
-            margin-bottom: 0.5rem;
-        }
-
-        .dark-mode .progress-bar {
-            background-color: #3a3b4a;
+            width: 100%;
+            height: 6px;
+            background-color: var(--secondary-color);
+            border-radius: 3px;
+            cursor: pointer;
+            margin-bottom: 5px;
         }
 
         .progress {
             height: 100%;
-            background-color: var(--success-color);
+            background-color: var(--primary-color);
+            border-radius: 3px;
             width: 0%;
-            transition: width 1s ease;
         }
 
-        .progress-labels {
+        .time-info {
             display: flex;
             justify-content: space-between;
-            font-size: 0.875rem;
+            font-size: 0.9rem;
+            color: #777;
         }
 
-        .error {
-            color: var(--warning-color);
-            margin-top: 0.5rem;
-            font-size: 0.875rem;
-            display: none;
-        }
-
-        .zodiac-sign {
+        .controls {
             display: flex;
+            justify-content: center;
             align-items: center;
-            margin-top: 1rem;
-            padding: 1rem;
-            background-color: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
+            gap: 20px;
+            margin-bottom: 20px;
         }
 
-        .dark-mode .zodiac-sign {
-            background-color: #2b2d42;
+        .control-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-color);
+            padding: 10px;
+            border-radius: 50%;
+            transition: background-color 0.2s;
         }
 
-        .zodiac-icon {
+        .control-btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .play-btn {
             font-size: 2rem;
-            margin-right: 1rem;
-            color: gold;
+            background-color: var(--primary-color);
+            color: white;
         }
 
-        .save-section {
-            margin-top: 1rem;
+        .play-btn:hover {
+            background-color: #3a5f8a;
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .volume-slider {
+            width: 100px;
+        }
+
+        .search-bar {
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filter-btn {
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            cursor: pointer;
+        }
+
+        .filter-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .playlist-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 15px;
         }
 
-        .saved-notice {
-            color: var(--success-color);
-            font-weight: 500;
+        .upload-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .playlist {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .playlist-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+
+        .playlist-item:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .playlist-item.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .playlist-item-info {
+            flex: 1;
+        }
+
+        .playlist-item-title {
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .playlist-item-artist {
+            margin: 0;
+            font-size: 0.8rem;
+            color: #777;
+        }
+
+        .playlist-item.active .playlist-item-artist {
+            color: #ccc;
+        }
+
+        .playlist-item-duration {
+            font-size: 0.8rem;
+            color: #777;
+        }
+
+        .playlist-item.active .playlist-item-duration {
+            color: #ccc;
+        }
+
+        .upload-modal {
             display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .upload-modal-content {
+            background-color: var(--player-bg);
+            padding: 20px;
+            border-radius: 10px;
+            width: 400px;
+            max-width: 90%;
+        }
+
+        .upload-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        .file-upload {
+            margin-bottom: 20px;
+        }
+
+        .file-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px dashed #ddd;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .modal-actions button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .cancel-btn {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+        }
+
+        .save-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .player-container {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
-    <button class="theme-toggle" id="themeToggle">
-        <i class="fas fa-moon"></i>
-    </button>
-
     <div class="container">
         <header>
-            <h1><i class="fas fa-calculator"></i> Age Calculator</h1>
-            <p>Enter your date of birth to calculate your exact age and discover interesting facts</p>
+            <h1>Music Player</h1>
+            <button class="theme-toggle" id="themeToggle">🌓</button>
         </header>
 
-        <div class="input-section">
-            <div class="input-group">
-                <label for="day">Day</label>
-                <input type="number" id="day" placeholder="DD" min="1" max="31">
-                <div class="error" id="dayError">Please enter a valid day</div>
-            </div>
-
-            <div class="input-group">
-                <label for="month">Month</label>
-                <select id="month">
-                    <option value="">Select Month</option>
-                    <option value="0">January</option>
-                    <option value="1">February</option>
-                    <option value="2">March</option>
-                    <option value="3">April</option>
-                    <option value="4">May</option>
-                    <option value="5">June</option>
-                    <option value="6">July</option>
-                    <option value="7">August</option>
-                    <option value="8">September</option>
-                    <option value="9">October</option>
-                    <option value="10">November</option>
-                    <option value="11">December</option>
-                </select>
-                <div class="error" id="monthError">Please select a month</div>
-            </div>
-
-            <div class="input-group">
-                <label for="year">Year</label>
-                <input type="number" id="year" placeholder="YYYY" min="1900" max="">
-                <div class="error" id="yearError">Please enter a valid year</div>
-            </div>
-        </div>
-
-        <button id="calculateBtn">Calculate Age</button>
-
-        <div class="save-section">
-            <div class="saved-notice" id="savedNotice">
-                <i class="fas fa-check-circle"></i> Birthdate saved
-            </div>
-            <button id="saveBtn">Save Birthdate</button>
-        </div>
-
-        <div class="results" id="results">
-            <h2>Your Age Results</h2>
-            
-            <div class="age-display" id="ageDisplay"></div>
-
-            <div class="detailed-results">
-                <div class="result-item">
-                    <h3>Age in Months</h3>
-                    <p id="ageMonths"></p>
-                </div>
-                <div class="result-item">
-                    <h3>Age in Weeks</h3>
-                    <p id="ageWeeks"></p>
-                </div>
-                <div class="result-item">
-                    <h3>Age in Days</h3>
-                    <p id="ageDays"></p>
-                </div>
-                <div class="result-item">
-                    <h3>Age in Hours</h3>
-                    <p id="ageHours"></p>
-                </div>
-            </div>
-
-            <div class="zodiac-sign" id="zodiacSign">
-                <div class="zodiac-icon" id="zodiacIcon"></div>
-                <div>
-                    <h3>Your Zodiac Sign</h3>
-                    <p id="zodiacText"></p>
-                </div>
-            </div>
-
-            <div class="milestones" id="milestones">
-                <h2>Milestones</h2>
-                <div class="milestone">
-                    <div class="milestone-icon">
-                        <i class="fas fa-birthday-cake"></i>
+        <div class="player-container">
+            <div class="player-main">
+                <div class="now-playing">
+                    <div class="album-art">
+                        <img id="albumArt" src="https://via.placeholder.com/120" alt="Album Art">
                     </div>
-                    <div class="milestone-content">
-                        <h3>Next Birthday</h3>
-                        <p id="nextBirthday"></p>
+                    <div class="track-info">
+                        <h2 class="track-title" id="trackTitle">No track selected</h2>
+                        <p class="track-artist" id="trackArtist">-</p>
                     </div>
                 </div>
-                <div class="milestone">
-                    <div class="milestone-icon">
-                        <i class="fas fa-hourglass-half"></i>
+
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar">
+                        <div class="progress" id="progress"></div>
                     </div>
-                    <div class="milestone-content">
-                        <h3>Countdown</h3>
-                        <p id="birthdayCountdown"></p>
+                    <div class="time-info">
+                        <span id="currentTime">0:00</span>
+                        <span id="duration">0:00</span>
                     </div>
+                </div>
+
+                <div class="controls">
+                    <button class="control-btn" id="prevBtn">⏮</button>
+                    <button class="control-btn play-btn" id="playBtn">▶</button>
+                    <button class="control-btn" id="nextBtn">⏭</button>
+                </div>
+
+                <div class="volume-control">
+                    <span>🔈</span>
+                    <input type="range" min="0" max="1" step="0.01" value="0.7" class="volume-slider" id="volumeSlider">
+                </div>
+
+                <div class="search-bar">
+                    <input type="text" class="search-input" id="searchInput" placeholder="Search songs...">
+                </div>
+
+                <div class="filters">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="genre">Genre</button>
+                    <button class="filter-btn" data-filter="artist">Artist</button>
                 </div>
             </div>
 
-            <div class="progress-container">
-                <h2>Life Progress</h2>
-                <p>Based on average life expectancy of 80 years</p>
-                <div class="progress-bar">
-                    <div class="progress" id="lifeProgress"></div>
+            <div class="playlist-section">
+                <div class="playlist-header">
+                    <h2>Playlist</h2>
+                    <button class="upload-btn" id="uploadBtn">Upload</button>
                 </div>
-                <div class="progress-labels">
-                    <span>0</span>
-                    <span id="currentAgeLabel">0</span>
-                    <span>80</span>
-                </div>
+                <ul class="playlist" id="playlist">
+                    <!-- Playlist items will be added here dynamically -->
+                </ul>
             </div>
         </div>
     </div>
 
+    <div class="upload-modal" id="uploadModal">
+        <div class="upload-modal-content">
+            <div class="upload-modal-header">
+                <h2>Upload Music</h2>
+                <button class="close-btn" id="closeModalBtn">×</button>
+            </div>
+            <div class="file-upload">
+                <input type="file" class="file-input" id="fileInput" accept="audio/*">
+            </div>
+            <div class="form-group">
+                <label for="titleInput">Title</label>
+                <input type="text" id="titleInput" placeholder="Enter song title">
+            </div>
+            <div class="form-group">
+                <label for="artistInput">Artist</label>
+                <input type="text" id="artistInput" placeholder="Enter artist name">
+            </div>
+            <div class="form-group">
+                <label for="genreSelect">Genre</label>
+                <select id="genreSelect">
+                    <option value="Pop">Pop</option>
+                    <option value="Rock">Rock</option>
+                    <option value="Hip Hop">Hip Hop</option>
+                    <option value="Electronic">Electronic</option>
+                    <option value="Jazz">Jazz</option>
+                    <option value="Classical">Classical</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button class="cancel-btn" id="cancelUploadBtn">Cancel</button>
+                <button class="save-btn" id="saveUploadBtn">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="audioPlayer"></audio>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Get all input elements and error messages
-            const dayInput = document.getElementById('day');
-            const monthInput = document.getElementById('month');
-            const yearInput = document.getElementById('year');
-            const dayError = document.getElementById('dayError');
-            const monthError = document.getElementById('monthError');
-            const yearError = document.getElementById('yearError');
-
-            // Set max year to current year
-            yearInput.max = new Date().getFullYear();
-
-            // Theme toggle
+            // DOM Elements
+            const audioPlayer = document.getElementById('audioPlayer');
+            const playBtn = document.getElementById('playBtn');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const progressBar = document.getElementById('progressBar');
+            const progress = document.getElementById('progress');
+            const currentTimeDisplay = document.getElementById('currentTime');
+            const durationDisplay = document.getElementById('duration');
+            const volumeSlider = document.getElementById('volumeSlider');
+            const playlist = document.getElementById('playlist');
+            const trackTitle = document.getElementById('trackTitle');
+            const trackArtist = document.getElementById('trackArtist');
+            const albumArt = document.getElementById('albumArt');
+            const searchInput = document.getElementById('searchInput');
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            const uploadBtn = document.getElementById('uploadBtn');
+            const uploadModal = document.getElementById('uploadModal');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const cancelUploadBtn = document.getElementById('cancelUploadBtn');
+            const fileInput = document.getElementById('fileInput');
+            const titleInput = document.getElementById('titleInput');
+            const artistInput = document.getElementById('artistInput');
+            const genreSelect = document.getElementById('genreSelect');
+            const saveUploadBtn = document.getElementById('saveUploadBtn');
             const themeToggle = document.getElementById('themeToggle');
-            themeToggle.addEventListener('click', function() {
-                document.body.classList.toggle('dark-mode');
-                const icon = themeToggle.querySelector('i');
-                if (document.body.classList.contains('dark-mode')) {
-                    icon.classList.replace('fa-moon', 'fa-sun');
-                    localStorage.setItem('darkMode', 'enabled');
-                } else {
-                    icon.classList.replace('fa-sun', 'fa-moon');
-                    localStorage.setItem('darkMode', 'disabled');
+
+            // Player state
+            let songs = [];
+            let currentSongIndex = 0;
+            let isPlaying = false;
+            let currentFilter = 'all';
+            let searchQuery = '';
+
+            // Sample data (would be replaced with actual uploaded songs)
+            const sampleSongs = [
+                {
+                    title: 'Sample Song 1',
+                    artist: 'Artist A',
+                    genre: 'Pop',
+                    duration: '3:45',
+                    file: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+                    cover: 'https://via.placeholder.com/120/4a76a8/ffffff?text=Pop'
+                },
+                {
+                    title: 'Sample Song 2',
+                    artist: 'Artist B',
+                    genre: 'Rock',
+                    duration: '4:20',
+                    file: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+                    cover: 'https://via.placeholder.com/120/a84a4a/ffffff?text=Rock'
+                },
+                {
+                    title: 'Sample Song 3',
+                    artist: 'Artist C',
+                    genre: 'Electronic',
+                    duration: '5:12',
+                    file: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+                    cover: 'https://via.placeholder.com/120/4aa84a/ffffff?text=Electronic'
                 }
-            });
+            ];
 
-            // Check for saved theme preference
-            if (localStorage.getItem('darkMode') === 'enabled') {
-                document.body.classList.add('dark-mode');
-                themeToggle.querySelector('i').classList.replace('fa-moon', 'fa-sun');
-            }
-
-            // Check for saved birthdate
-            if (localStorage.getItem('savedBirthdate')) {
-                const savedDate = new Date(localStorage.getItem('savedBirthdate'));
-                document.getElementById('day').value = savedDate.getDate();
-                document.getElementById('month').value = savedDate.getMonth();
-                document.getElementById('year').value = savedDate.getFullYear();
-                calculateAge();
-            }
-
-            function validateDate() {
-                let isValid = true;
+            // Initialize player
+            function initPlayer() {
+                songs = [...sampleSongs];
+                renderPlaylist();
+                loadSong(currentSongIndex);
                 
-                // Validate day
-                if (!dayInput.value || dayInput.value < 1 || dayInput.value > 31) {
-                    dayError.style.display = 'block';
-                    isValid = false;
-                } else {
-                    dayError.style.display = 'none';
+                // Load from localStorage if available
+                const savedSongs = localStorage.getItem('musicPlayerSongs');
+                if (savedSongs) {
+                    songs = JSON.parse(savedSongs);
+                    renderPlaylist();
                 }
-
-                // Validate month
-                if (!monthInput.value) {
-                    monthError.style.display = 'block';
-                    isValid = false;
-                } else {
-                    monthError.style.display = 'none';
+                
+                // Load theme preference
+                const savedTheme = localStorage.getItem('musicPlayerTheme');
+                if (savedTheme === 'dark') {
+                    document.body.classList.add('dark-mode');
                 }
+            }
 
-                // Validate year
-                const currentYear = new Date().getFullYear();
-                if (!yearInput.value || yearInput.value < 1900 || yearInput.value > currentYear) {
-                    yearError.style.display = 'block';
-                    isValid = false;
-                } else {
-                    yearError.style.display = 'none';
-                }
-
-                // Check for valid date (e.g., not Feb 30)
-                if (isValid) {
-                    const day = parseInt(dayInput.value);
-                    const month = parseInt(monthInput.value);
-                    const year = parseInt(yearInput.value);
-                    const testDate = new Date(year, month, day);
+            // Render playlist
+            function renderPlaylist() {
+                playlist.innerHTML = '';
+                
+                const filteredSongs = songs.filter(song => {
+                    const matchesFilter = currentFilter === 'all' || 
+                                        (currentFilter === 'genre' && song.genre.toLowerCase().includes(searchQuery.toLowerCase())) ||
+                                        (currentFilter === 'artist' && song.artist.toLowerCase().includes(searchQuery.toLowerCase()));
                     
-                    if (testDate.getDate() !== day || testDate.getMonth() !== month || testDate.getFullYear() !== year) {
-                        dayError.textContent = 'Invalid date for this month/year';
-                        dayError.style.display = 'block';
-                        isValid = false;
-                    }
-                }
-
-                return isValid;
-            }
-
-            function calculateAge() {
-                // First clear any saved date when calculating new age
-                localStorage.removeItem('savedBirthdate');
-                document.getElementById('savedNotice').style.display = 'none';
+                    const matchesSearch = song.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                         song.artist.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                         song.genre.toLowerCase().includes(searchQuery.toLowerCase());
+                    
+                    return matchesFilter && (searchQuery === '' || matchesSearch);
+                });
                 
-                if (!validateDate()) return;
-
-                const day = parseInt(dayInput.value);
-                const month = parseInt(monthInput.value);
-                const year = parseInt(yearInput.value);
-                const birthDate = new Date(year, month, day);
-                const today = new Date();
-
-                // Check if birthdate is in the future
-                if (birthDate > today) {
-                    yearError.textContent = 'Birthdate cannot be in the future';
-                    yearError.style.display = 'block';
+                if (filteredSongs.length === 0) {
+                    const emptyItem = document.createElement('li');
+                    emptyItem.textContent = 'No songs found';
+                    emptyItem.style.padding = '10px';
+                    emptyItem.style.textAlign = 'center';
+                    playlist.appendChild(emptyItem);
                     return;
                 }
-
-                // Calculate age in years
-                let age = today.getFullYear() - birthDate.getFullYear();
-                const monthDiff = today.getMonth() - birthDate.getMonth();
                 
-                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-                    age--;
-                }
-
-                // Calculate detailed age information
-                const ageInMilliseconds = today - birthDate;
-                const ageInSeconds = ageInMilliseconds / 1000;
-                const ageInMinutes = ageInSeconds / 60;
-                const ageInHours = ageInMinutes / 60;
-                const ageInDays = ageInHours / 24;
-                const ageInWeeks = ageInDays / 7;
-                const ageInMonths = age * 12 + monthDiff;
-
-                // Display results
-                document.getElementById('ageDisplay').textContent = `${age} years`;
-                document.getElementById('ageMonths').textContent = Math.floor(ageInMonths).toLocaleString();
-                document.getElementById('ageWeeks').textContent = Math.floor(ageInWeeks).toLocaleString();
-                document.getElementById('ageDays').textContent = Math.floor(ageInDays).toLocaleString();
-                document.getElementById('ageHours').textContent = Math.floor(ageInHours).toLocaleString();
-
-                // Calculate next birthday
-                const nextBirthday = new Date(today.getFullYear(), month, day);
-                if (nextBirthday < today) {
-                    nextBirthday.setFullYear(today.getFullYear() + 1);
-                }
-
-                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                document.getElementById('nextBirthday').textContent = nextBirthday.toLocaleDateString(undefined, options);
-
-                // Calculate countdown to next birthday
-                const countdown = nextBirthday - today;
-                const countdownDays = Math.floor(countdown / (1000 * 60 * 60 * 24));
-                const countdownMonths = Math.floor(countdownDays / 30);
-                const remainingDays = countdownDays % 30;
-
-                let countdownText = '';
-                if (countdownMonths > 0) {
-                    countdownText += `${countdownMonths} month${countdownMonths !== 1 ? 's' : ''}`;
-                    if (remainingDays > 0) {
-                        countdownText += ` and ${remainingDays} day${remainingDays !== 1 ? 's' : ''}`;
+                filteredSongs.forEach((song, index) => {
+                    const originalIndex = songs.findIndex(s => s.title === song.title && s.artist === song.artist);
+                    const playlistItem = document.createElement('li');
+                    playlistItem.className = 'playlist-item';
+                    if (originalIndex === currentSongIndex) {
+                        playlistItem.classList.add('active');
                     }
-                } else {
-                    countdownText = `${countdownDays} day${countdownDays !== 1 ? 's' : ''}`;
-                }
-
-                document.getElementById('birthdayCountdown').textContent = countdownText;
-
-                // Calculate life progress
-                const lifeProgress = (age / 80) * 100;
-                document.getElementById('lifeProgress').style.width = `${lifeProgress}%`;
-                document.getElementById('currentAgeLabel').textContent = age;
-
-                // Determine zodiac sign
-                const zodiacSign = getZodiacSign(day, month + 1); // +1 because months are 0-indexed
-                document.getElementById('zodiacText').textContent = zodiacSign.name;
-                document.getElementById('zodiacIcon').className = `zodiac-icon ${zodiacSign.icon}`;
-
-                // Show results
-                document.getElementById('results').style.display = 'block';
+                    
+                    playlistItem.innerHTML = `
+                        <div class="playlist-item-info">
+                            <h3 class="playlist-item-title">${song.title}</h3>
+                            <p class="playlist-item-artist">${song.artist} • ${song.genre}</p>
+                        </div>
+                        <span class="playlist-item-duration">${song.duration}</span>
+                    `;
+                    
+                    playlistItem.addEventListener('click', () => {
+                        currentSongIndex = originalIndex;
+                        loadSong(currentSongIndex);
+                        playSong();
+                        highlightCurrentSong();
+                    });
+                    
+                    playlist.appendChild(playlistItem);
+                });
             }
 
-            // Zodiac sign calculation
-            function getZodiacSign(day, month) {
-                const signs = [
-                    { name: "Capricorn", icon: "fas fa-goat", start: { month: 1, day: 20 }, end: { month: 2, day: 18 } },
-                    { name: "Aquarius", icon: "fas fa-water", start: { month: 1, day: 19 }, end: { month: 2, day: 18 } },
-                    { name: "Pisces", icon: "fas fa-fish", start: { month: 2, day: 19 }, end: { month: 3, day: 20 } },
-                    { name: "Aries", icon: "fas fa-ram", start: { month: 3, day: 21 }, end: { month: 4, day: 19 } },
-                    { name: "Taurus", icon: "fas fa-bull", start: { month: 4, day: 20 }, end: { month: 5, day: 20 } },
-                    { name: "Gemini", icon: "fas fa-users", start: { month: 5, day: 21 }, end: { month: 6, day: 20 } },
-                    { name: "Cancer", icon: "fas fa-crab", start: { month: 6, day: 21 }, end: { month: 7, day: 22 } },
-                    { name: "Leo", icon: "fas fa-lion", start: { month: 7, day: 23 }, end: { month: 8, day: 22 } },
-                    { name: "Virgo", icon: "fas fa-wheat-alt", start: { month: 8, day: 23 }, end: { month: 9, day: 22 } },
-                    { name: "Libra", icon: "fas fa-balance-scale", start: { month: 9, day: 23 }, end: { month: 10, day: 22 } },
-                    { name: "Scorpio", icon: "fas fa-scorpion", start: { month: 10, day: 23 }, end: { month: 11, day: 21 } },
-                    { name: "Sagittarius", icon: "fas fa-archery-target", start: { month: 11, day: 22 }, end: { month: 12, day: 21 } },
-                    { name: "Capricorn", icon: "fas fa-goat", start: { month: 12, day: 22 }, end: { month: 1, day: 19 } }
-                ];
-
-                for (const sign of signs) {
-                    if (
-                        (month === sign.start.month && day >= sign.start.day) ||
-                        (month === sign.end.month && day <= sign.end.day)
-                    ) {
-                        return sign;
+            // Load song
+            function loadSong(index) {
+                if (songs.length === 0) return;
+                
+                const song = songs[index];
+                audioPlayer.src = song.file;
+                trackTitle.textContent = song.title;
+                trackArtist.textContent = song.artist;
+                albumArt.querySelector('img').src = song.cover || 'https://via.placeholder.com/120';
+                
+                // Wait for metadata to load to display duration
+                audioPlayer.addEventListener('loadedmetadata', () => {
+                    const duration = audioPlayer.duration;
+                    const minutes = Math.floor(duration / 60);
+                    const seconds = Math.floor(duration % 60);
+                    durationDisplay.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                    
+                    // If the song doesn't have a duration, update it
+                    if (!song.duration || song.duration === '0:00') {
+                        song.duration = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                        saveSongsToLocalStorage();
                     }
-                }
+                });
+                
+                highlightCurrentSong();
+            }
 
-                return { name: "Unknown", icon: "fas fa-question" };
+            // Play song
+            function playSong() {
+                if (songs.length === 0) return;
+                
+                isPlaying = true;
+                audioPlayer.play();
+                playBtn.textContent = '⏸';
+            }
+
+            // Pause song
+            function pauseSong() {
+                isPlaying = false;
+                audioPlayer.pause();
+                playBtn.textContent = '▶';
+            }
+
+            // Next song
+            function nextSong() {
+                if (songs.length === 0) return;
+                
+                currentSongIndex = (currentSongIndex + 1) % songs.length;
+                loadSong(currentSongIndex);
+                if (isPlaying) playSong();
+            }
+
+            // Previous song
+            function prevSong() {
+                if (songs.length === 0) return;
+                
+                currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length;
+                loadSong(currentSongIndex);
+                if (isPlaying) playSong();
+            }
+
+            // Update progress bar
+            function updateProgress() {
+                const { currentTime, duration } = audioPlayer;
+                const progressPercent = (currentTime / duration) * 100;
+                progress.style.width = `${progressPercent}%`;
+                
+                // Update time display
+                const currentMinutes = Math.floor(currentTime / 60);
+                const currentSeconds = Math.floor(currentTime % 60);
+                currentTimeDisplay.textContent = `${currentMinutes}:${currentSeconds < 10 ? '0' : ''}${currentSeconds}`;
+            }
+
+            // Set progress
+            function setProgress(e) {
+                const width = this.clientWidth;
+                const clickX = e.offsetX;
+                const duration = audioPlayer.duration;
+                audioPlayer.currentTime = (clickX / width) * duration;
+            }
+
+            // Highlight current song in playlist
+            function highlightCurrentSong() {
+                const items = playlist.querySelectorAll('.playlist-item');
+                items.forEach((item, index) => {
+                    item.classList.remove('active');
+                    
+                    // Find the original index in the songs array
+                    const title = item.querySelector('.playlist-item-title').textContent;
+                    const artist = item.querySelector('.playlist-item-artist').textContent.split(' • ')[0];
+                    const originalIndex = songs.findIndex(song => song.title === title && song.artist === artist);
+                    
+                    if (originalIndex === currentSongIndex) {
+                        item.classList.add('active');
+                        // Scroll to the active item
+                        item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
+                });
+            }
+
+            // Save songs to localStorage
+            function saveSongsToLocalStorage() {
+                localStorage.setItem('musicPlayerSongs', JSON.stringify(songs));
+            }
+
+            // Upload new song
+            function uploadSong() {
+                const file = fileInput.files[0];
+                if (!file) {
+                    alert('Please select a music file');
+                    return;
+                }
+                
+                const title = titleInput.value.trim() || file.name.replace(/\.[^/.]+$/, "");
+                const artist = artistInput.value.trim() || 'Unknown Artist';
+                const genre = genreSelect.value;
+                
+                // Create object URL for the file
+                const fileUrl = URL.createObjectURL(file);
+                
+                const newSong = {
+                    title,
+                    artist,
+                    genre,
+                    duration: '0:00', // Will be updated when loaded
+                    file: fileUrl,
+                    cover: 'https://via.placeholder.com/120'
+                };
+                
+                songs.push(newSong);
+                saveSongsToLocalStorage();
+                
+                // Reset form
+                fileInput.value = '';
+                titleInput.value = '';
+                artistInput.value = '';
+                
+                // Close modal and update playlist
+                uploadModal.style.display = 'none';
+                renderPlaylist();
+            }
+
+            // Toggle theme
+            function toggleTheme() {
+                document.body.classList.toggle('dark-mode');
+                const isDark = document.body.classList.contains('dark-mode');
+                localStorage.setItem('musicPlayerTheme', isDark ? 'dark' : 'light');
             }
 
             // Event listeners
-            document.getElementById('calculateBtn').addEventListener('click', calculateAge);
-
-            // Save birthdate
-            document.getElementById('saveBtn').addEventListener('click', function() {
-                if (!validateDate()) return;
-
-                const day = parseInt(dayInput.value);
-                const month = parseInt(monthInput.value);
-                const year = parseInt(yearInput.value);
-                const birthDate = new Date(year, month, day);
-
-                // Clear any previous saved date first
-                localStorage.removeItem('savedBirthdate');
-                // Save new date
-                localStorage.setItem('savedBirthdate', birthDate.toISOString());
-                
-                const savedNotice = document.getElementById('savedNotice');
-                savedNotice.style.display = 'block';
-                setTimeout(() => {
-                    savedNotice.style.display = 'none';
-                }, 3000);
+            playBtn.addEventListener('click', () => {
+                if (songs.length === 0) return;
+                isPlaying ? pauseSong() : playSong();
             });
 
-            // Auto-calculate when all fields are filled
-            [dayInput, monthInput, yearInput].forEach(input => {
-                input.addEventListener('change', function() {
-                    if (dayInput.value && monthInput.value && yearInput.value) {
-                        calculateAge();
-                    }
+            nextBtn.addEventListener('click', nextSong);
+            prevBtn.addEventListener('click', prevSong);
+
+            audioPlayer.addEventListener('timeupdate', updateProgress);
+            audioPlayer.addEventListener('ended', nextSong);
+            audioPlayer.addEventListener('loadedmetadata', updateProgress);
+
+            progressBar.addEventListener('click', setProgress);
+
+            volumeSlider.addEventListener('input', () => {
+                audioPlayer.volume = volumeSlider.value;
+            });
+
+            searchInput.addEventListener('input', (e) => {
+                searchQuery = e.target.value;
+                renderPlaylist();
+            });
+
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentFilter = btn.dataset.filter;
+                    renderPlaylist();
                 });
             });
+
+            uploadBtn.addEventListener('click', () => {
+                uploadModal.style.display = 'flex';
+            });
+
+            closeModalBtn.addEventListener('click', () => {
+                uploadModal.style.display = 'none';
+            });
+
+            cancelUploadBtn.addEventListener('click', () => {
+                uploadModal.style.display = 'none';
+            });
+
+            saveUploadBtn.addEventListener('click', uploadSong);
+
+            themeToggle.addEventListener('click', toggleTheme);
+
+            // Initialize the player
+            initPlayer();
         });
     </script>
 </body>
